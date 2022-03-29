@@ -10,7 +10,7 @@ function finalize(::Paragraph, p::Parser, block::Node)
     has_reference_defs = false
     # Try parsing the beginning as link reference definitions.
     while get(block.literal, 1, nothing) === '['
-        pos = parse_reference(p.inline_parser, block.literal, p.refmap)
+        pos = parse_reference(p.inline_parser, block.literal, block, p.refmap)
         pos == 0 && break
         block.literal = block.literal[pos+1:end]
         has_reference_defs = true

@@ -42,7 +42,7 @@ function setext_heading(parser::Parser, container::Node)
             close_unmatched_blocks(parser)
             # resolve reference link definitiosn
             while get(container.literal, 1, nothing) == '['
-                pos = parse_reference(parser.inline_parser, container.literal, parser.refmap)
+                pos = parse_reference(parser.inline_parser, container.literal, container, parser.refmap)
                 if pos == 0
                     break
                 end

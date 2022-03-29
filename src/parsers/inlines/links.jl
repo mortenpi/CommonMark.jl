@@ -14,6 +14,20 @@ end
 
 is_container(::Image) = true
 
+mutable struct LinkReferenceDefinition <: AbstractBlock
+    label::String
+    destination::String
+    title::String
+    LinkReferenceDefinition() = new("", "", "")
+end
+
+mutable struct ReferenceLink <: AbstractInline
+    label::String
+    ReferenceLink() = new("")
+end
+
+is_container(::ReferenceLink) = true
+
 chomp_ws(parser::InlineParser) = (consume(parser, match(reSpnl, parser)); true)
 
 function parse_link_title(parser::InlineParser)
@@ -138,7 +152,7 @@ function parse_close_bracket(parser::InlineParser, block::Node)
             seek(parser, savepos)
         end
     end
-    if !matched
+    node = if !matched
         # Next, see if there's a link label.
         beforelabel = position(parser)
         n = parse_link_label(parser)
@@ -159,15 +173,19 @@ function parse_close_bracket(parser::InlineParser, block::Node)
             # Lookup rawlabel in refmap.
             link = get(parser.refmap, normalize_reference(reflabel), nothing)
             if link !== nothing
-                dest, title = link
                 matched = true
+                reflink = ReferenceLink()
+                reflink.label = reflabel
+                Node(reflink)
             end
         end
+    else
+        t = Node(is_image ? Image() : Link())
+        t.destination = dest
+        t.title = title === nothing ? "" : title
+        Node(t)
     end
     if matched
-        node = Node(is_image ? Image() : Link())
-        node.t.destination = dest
-        node.t.title = title === nothing ? "" : title
         tmp = opener.node.nxt
         while !isnull(tmp)
             nxt = tmp.nxt
@@ -211,7 +229,7 @@ end
 
 remove_bracket!(p::InlineParser) = p.brackets = p.brackets.previous
 
-function parse_reference(parser::InlineParser, s::AbstractString, refmap::Dict)
+function parse_reference(parser::InlineParser, s::AbstractString, block::Node, refmap::Dict)
     parser.buf = s
     seek(parser, 1)
     startpos = position(parser)
@@ -265,6 +283,13 @@ function parse_reference(parser::InlineParser, s::AbstractString, refmap::Dict)
 
     haskey(refmap, normlabel) || (refmap[normlabel] = (dest, title))
     parser.refmap = refmap
+
+    linkref = LinkReferenceDefinition()
+    linkref.label = normlabel
+    linkref.destination = dest
+    linkref.title = title
+    insert_before(block, Node(linkref, block.sourcepos))
+
     return position(parser) - startpos
 end
 

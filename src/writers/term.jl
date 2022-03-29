@@ -246,7 +246,7 @@ function write_term(::HtmlInline, render, node, enter)
     print_literal(render, inv(style))
 end
 
-function write_term(::Link, render, node, enter)
+function write_term(::Union{Link,ReferenceLink}, render, node, enter)
     style = crayon"blue underline"
     if enter
         print_literal(render, style)
@@ -255,6 +255,15 @@ function write_term(::Link, render, node, enter)
         pop_inline!(render)
         print_literal(render, inv(style))
     end
+end
+
+function write_term(::LinkReferenceDefinition, render, node, enter)
+    print_literal(render, "[", node.t.label, "]:")
+    print_literal(render, " ", node.t.destination)
+    if !isempty(node.t.title)
+        print_literal(render, " \"", node.t.title, "\"")
+    end
+    print_literal(render, "\n")
 end
 
 function write_term(::Image, render, node, enter)
