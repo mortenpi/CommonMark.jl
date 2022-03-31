@@ -183,7 +183,7 @@ function parse_close_bracket(parser::InlineParser, block::Node)
             end
         end
     else
-        t = Node(is_image ? Image() : Link())
+        t = is_image ? Image() : Link()
         t.destination = dest
         t.title = title === nothing ? "" : title
         Node(t)
