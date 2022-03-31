@@ -21,6 +21,9 @@ mutable struct LinkReferenceDefinition <: AbstractBlock
     LinkReferenceDefinition() = new("", "", "")
 end
 
+continue_(::LinkReferenceDefinition, parser::Parser, ::Any) = 1
+accepts_lines(::LinkReferenceDefinition) = false
+
 mutable struct ReferenceLink <: AbstractInline
     label::String
     ReferenceLink() = new("")
