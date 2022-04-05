@@ -124,6 +124,7 @@ include("blocks/thematic_breaks.jl")
 include("blocks/codeblocks.jl")
 include("blocks/htmlblocks.jl")
 include("blocks/paragraphs.jl")
+include("blocks/referencelinks.jl")
 
 # Block start functions.
 #
