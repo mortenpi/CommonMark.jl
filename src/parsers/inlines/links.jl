@@ -164,12 +164,18 @@ function parse_close_bracket(parser::InlineParser, block::Node)
         end
         if !isempty(reflabel)
             # Lookup rawlabel in refmap.
-            link = get(parser.refmap, normalize_reference(reflabel), nothing)
+            normlabel = normalize_reference(reflabel)
+            link = get(parser.refmap, normlabel, nothing)
             if link !== nothing
                 matched = true
                 reflink = ReferenceLink()
-                reflink.label = reflabel
+                reflink.label = normlabel
                 Node(reflink)
+            else
+                @debug "Missing reflabel: '$(reflabel)'" normlabel
+                if parser.reflink_callback !== nothing
+                    parser.reflink_callback(normlabel)
+                end
             end
         end
     else

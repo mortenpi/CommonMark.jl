@@ -52,6 +52,7 @@ mutable struct InlineParser <: AbstractParser
     refmap::Dict{String, Any}
     inline_parsers::Dict{Char, Vector{Function}}
     modifiers::Vector{Function}
+    reflink_callback::Any
 
     function InlineParser()
         parser = new()
@@ -63,6 +64,7 @@ mutable struct InlineParser <: AbstractParser
         parser.refmap = Dict()
         parser.inline_parsers = Dict()
         parser.modifiers = Function[]
+        parser.reflink_callback = nothing
         return parser
     end
 end
