@@ -424,11 +424,11 @@ contains_inlines(t) = false
 contains_inlines(::Paragraph) = true
 contains_inlines(::Heading) = true
 
-function parse(parser::Parser, my_input::IO; kws...)
+function parse(parser::Parser, my_input::IO; refmap :: Union{Dict{String, Tuple{String, String}},Nothing} = nothing, kws...)
     parser.doc = Node(Document(), ((1, 1), (0, 0)))
     isempty(kws) || (merge!(parser.doc.meta, Dict(string(k) => v for (k, v) in kws)))
     parser.tip = parser.doc
-    parser.refmap = Dict{String, Tuple{String, String}}()
+    parser.refmap = (refmap === nothing) ? Dict{String, Tuple{String, String}}() : refmap
     parser.line_number = 0
     parser.last_line_length = 0
     parser.pos = 1
